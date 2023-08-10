@@ -35,103 +35,100 @@ def count_even_numbers_block(arr)
 
 #   Object Orientation
 #   Write a program in ruby which represents a single Company which has employees, departments and projects. 
-
 class Employee
-    attr_accessor :name, :age, :designation
+  attr_accessor :name
 
-    def initialize(name, age, designation)
-      @name = name
-      @age = age
-      @designation = designation
-    end
+  def initialize(name)
+    @name = name
+  end
+end
 
-    def to_s
-      "#{name}, Age: #{age}, Designation: #{designation}"
-    end
+class Department
+  attr_accessor :name, :department_head, :employees
+
+  def initialize(name, department_head)
+    @name = name
+    @department_head = department_head
+    @employees = []
   end
 
-  class Department
-    attr_accessor :name, :head, :employees
-
-    def initialize(name, head)
-      @name = name
-      @head = head
-      @employees = []
-    end
-
-    def add_employee(employee)
-      @employees << employee
-    end
-
-    def to_s
-      "#{name} Department - Head: #{head}\nEmployees:\n#{employees.join("\n")}"
-    end
+  def add_employee(employee)
+    @employees << employee
   end
 
+  def employee_count
+    @employees.length
+  end
+end
+
+class Company
+  attr_accessor :name, :departments
+
+  def initialize(name)
+    @name = name
+    @departments = []
+  end
+
+  def add_department(department)
+    @departments << department
+  end
+end
+
+# Creating employees
+employee1 = Employee.new("John Doe")
+employee2 = Employee.new("Jane Smith")
+
+# Creating departments
+engineering = Department.new("Engineering", "Engineering Head")
+hr = Department.new("HR", "HR Head")
+
+# Adding employees to departments
+engineering.add_employee(employee1)
+hr.add_employee(employee2)
+
+# Creating a company
+company = Company.new("TVM infotech")
+
+# Adding departments to the company
+company.add_department(engineering)
+company.add_department(hr)
+
+# Displaying company information
+puts "Company: #{company.name}"
+company.departments.each do |department|
+  puts "Department: #{department.name}"
+  puts "Department Head: #{department.department_head}"
+  puts "Employee Count: #{department.employee_count}"
+end
+  # Service and Product type projects 
   class Project
-    attr_accessor :name, :department, :description
-
-    def initialize(name, department, description)
+    attr_accessor :name, :department, :description, :project_type
+  
+    def initialize(name, department, description, project_type)
       @name = name
       @department = department
       @description = description
+      @project_type = project_type
     end
-
+  
+    def calculate_profit(revenue)
+      if project_type == "Service"
+        revenue * 0.7 # Calculate profit for service project
+      elsif project_type == "Product"
+        revenue * 0.5 # Calculate profit for product project
+      else
+        raise "Invalid project type"
+      end
+    end
+  
     def to_s
-      "#{name} (#{department}):\n#{description}"
-    end
-  end
-
-  class Company
-    attr_accessor :name, :departments, :projects
-
-    def initialize(name)
-      @name = name
-      @departments = {}
-      @projects = []
-    end
-
-    def add_department(department)
-      @departments[department.name] = department
-    end
-
-    def add_project(project)
-      @projects << project
-    end
-
-    def to_s
-      result = "#{name} Company\n\n"
-      result += "Departments:\n"
-      departments.each_value { |dept| result += "#{dept}\n\n" }
-      result += "Projects:\n"
-      projects.each { |project| result += "#{project}\n\n" }
-      result
+      "#{name} (#{department}, #{project_type}):\n#{description}"
     end
   end
 
 
-  company = Company.new("TVM infotech")
-
-  # Employees
-  emp1 = Employee.new("John Doe", 30, "Software Engineer")
-  emp2 = Employee.new("Jane Smith", 35, "Marketing Manager")
-
-  # Departments
-  dept_hr = Department.new("HR", "HR Head Name")
-  dept_hr.add_employee(emp2)
-
-  dept_eng = Department.new("Engineering", "Engineering Head Name")
-  dept_eng.add_employee(emp1)
-
-  company.add_department(dept_hr)
-  company.add_department(dept_eng)
-
-  # Projects
-  proj1 = Project.new("Project A", "Engineering", " Project A")
-  proj2 = Project.new("Project B", "Marketing", "Project B")
-
-  company.add_project(proj1)
-  company.add_project(proj2)
-
-  # Print Company Details
-  puts "Company name: #{company}"
+  proj1 = Project.new("Project A", "Engineering", "Project A", "Service")
+revenue = 100000 
+profit = proj1.calculate_profit(revenue)
+puts "Profit for #{proj1.name}: #{profit}"
+  
