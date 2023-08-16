@@ -1,60 +1,133 @@
-
 require 'csv'
-require_relative 'employee'
-require_relative 'department'
-
-class Company
-  def initialize
-    @departments = []
+class Employee
+  attr_accessor :name, :age, :department, :division, :designation
+  def initialize(name, age, department, division, designation)
+    @name = name
+    @age = age
+    @department = department
+    @division = division
+    @designation = designation
   end
-  
-  def add_department(name, department_head)
-    department = Department.new(name, department_head)
+end
+class Department
+  attr_accessor :name, :department_head, :employees
+  def initialize(name, department_head)
+    @name = name
+    @department_head = department_head
+    @employees = []
+  end
+end
+class Project
+  attr_accessor :name, :profit
+  def initialize(name, profit)
+    @name = name
+    @profit = profit
+  end
+end
+class Product < Project
+  attr_accessor :clients, :totalProductProfit
+  def initialize(name, clients, profit)
+    super(name, profit)
+    @clients = clients
+    @totalProductProfit = 0
+  end
+  def calculate_product_profit
+    @totalProductProfit += profit
+  end
+  def total_profit
+    @totalProductProfit
+  end
+end
+class Service < Project
+  attr_accessor :clients, :totalServiceProfit
+  def initialize(name, clients, profit)
+    super(name, profit)
+    @clients = clients
+    @totalServiceProfit = 0
+  end
+  def calculate_service_profit
+    @totalServiceProfit += profit
+  end
+  def total_profit
+    @totalServiceProfit
+  end
+end
+class Company
+  attr_accessor :departments, :projects, :yearly_revenue, :service_profit, :product_profit
+  def initialize(*projects)
+    @departments = []
+    @projects = []
+    @yearly_revenue = 0
+  end
+  def add_department(department)
     @departments << department
   end
-  
-  def add_employee(employee)
-    department = @departments.find { |dept| dept.name == employee.department }
-    if department
-      department.employees << employee
-    else
-      puts "Department not found!"
+  def add_project(project)
+    @projects << project
+  end
+  def calculate_yearly_revenue
+    @projects.each do |project|
+ 	@yearly_revenue = project.profit + @yearly_revenue
     end
   end
-  
-  def hr
-    @departments.find { |dept| dept.name == 'HR' }
-  end
-  
-  def department_heads
-    @departments.map(&:department_head)
-  end
-  
-  def save_employee_data_to_csv(filename)
-    CSV.open(filename, 'w') do |csv|
-      csv << ['Name', 'Age', 'Department', 'Division', 'Designation']
-      @departments.each do |department|
-        department.employees.each do |employee|
-          csv << [employee.name, employee.age, employee.department, employee.division, employee.designation]
-        end
+  def calculate_yearly_profit
+    total_product_profit = 0
+    total_service_profit = 0
+    @projects.each do |project|
+      if project.is_a?(Product)
+        project.calculate_product_profit
+        total_product_profit += project.total_profit
+      elsif project.is_a?(Service)
+        project.calculate_service_profit
+        total_service_profit += project.total_profit
       end
+    end
+    puts "Total Product Profit: #{total_product_profit}"
+    puts "Total Service Profit: #{total_service_profit}"
+  end
+end
+class HR
+  attr_accessor :name, :employees
+  def initialize(name)
+    @name = name
+    @employees = []
+  end
+  def add_employee(employee)
+    @employees << employee
+    save_to_csv(employee)
+  end
+  def get_all_employee_details
+    @employees.each do |employee|
+      puts "Name: #{employee.name}, Age: #{employee.age}, Department: #{employee.department}, Division: #{employee.division}, Designation: #{employee.designation}"
+    end
+  end
+  private
+  def save_to_csv(employee)
+    CSV.open('employees.csv', 'a+') do |csv|
+      csv << [employee.name, employee.age, employee.department, employee.division, employee.designation]
     end
   end
 end
-
 # Example usage
 company = Company.new
-
-company.add_department('HR', 'HR Department Head')
-company.add_department('Engineering', 'Engineering Department Head')
-# Add more departments and department heads
-
-employee1 = Employee.new('John Doe', 30, 'HR', 'Recruitment', 'HR Specialist')
-employee2 = Employee.new('Jane Smith', 28, 'HR', 'Recruitment', 'Software Engineer')
-# Add more employees
-
-company.add_employee(employee1)
-company.add_employee(employee2)
-# Add more employees
-
-company.save_employee_data_to_csv('employee_data.csv')
+hr_department = Department.new('HR', 'HR Department Head')
+engineering_department = Department.new('Engineering', 'Engineering Department Head')
+sales_department = Department.new('Sales', 'Sales Department Head')
+marketing_department = Department.new('Marketing', 'Marketing Department Head')
+company.add_department(hr_department)
+company.add_department(engineering_department)
+company.add_department(sales_department)
+company.add_department(marketing_department)
+service_project = Service.new('Healthcare web', 'client 1', 50000)
+product_project = Product.new('webonise portal', 'client 2', 200000)
+company.add_project(service_project)
+company.add_project(product_project)
+hr = HR.new('HR Manager')
+employee1 = Employee.new('John Doe', 30, 'HR', 'Recruitment', 'Recruiter')
+employee2 = Employee.new('Jane Smith', 28, 'Engineering', 'Development', 'Software Engineer')
+hr.add_employee(employee1)
+hr.add_employee(employee2)
+engineering_department.employees << employee2
+hr.get_all_employee_details()
+company.calculate_yearly_revenue
+company.calculate_yearly_profit

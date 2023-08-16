@@ -1,35 +1,26 @@
-# Method using block
-def count_even_numbers_block(arr)
+def count_even_numbers(array)
   count = 0
-  arr.each { |num| count += 1 if num.even? }
+  array.each do |num|
+    count += 1 if num.even?
+  end
   count
 end
-
-# Method using proc
-def count_even_numbers_proc(arr, count_proc)
-  count_proc.call(arr)
-end
-
-# Method using lambda
-def count_even_numbers_lambda(arr, count_lambda)
-  count_lambda.call(arr)
-end
-
 numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-
-# Block
-count_using_block = count_even_numbers_block(numbers)
-puts "Count of even numbers using block: #{count_using_block}"
-
-# Proc
-count_proc = proc { |arr| arr.count(&:even?) }
-count_using_proc = count_even_numbers_proc(numbers, count_proc)
-puts "Count of even numbers using proc: #{count_using_proc}"
-
-# Lambda
-count_lambda = ->(arr) { arr.count(&:even?) }
-count_using_lambda = count_even_numbers_lambda(numbers, count_lambda)
-puts "Count of even numbers using lambda: #{count_using_lambda}"
+puts "Count of even numbers: #{count_even_numbers(numbers)}"
+#using Procs
+count_even = Proc.new { |num| num.even? }
+def count_numbers(array, condition)
+array.count(&condition)
+end
+numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+puts "Count of even numbers: #{count_numbers(numbers, count_even)}"
+#using lambda
+count_even = lambda { |num| num.even? }
+def count_numbers(array, condition)
+array.count(&condition)
+end
+numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+puts "Count of even numbers: #{count_numbers(numbers, count_even)}"
 
 # Project Class
 class Project
